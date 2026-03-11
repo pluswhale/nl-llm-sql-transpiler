@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Conversation {
+  id         Int       @id @default(autoincrement())
+  guest_name String
+  channel    String
+  created_at DateTime  @default(now())
+  status     String    @default("open")
+
+  messages   Message[]
+  tags       Tag[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id              Int          @id @default(autoincrement())
+  conversation_id Int
+  direction       String
+  body            String
+  sent_at         DateTime     @default(now())
+
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  @@map("messages")
+}
+
+model Tag {
+  id              Int          @id @default(autoincrement())
+  conversation_id Int
+  label           String
+
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  @@map("tags")
+}
